@@ -20,7 +20,7 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['test/**/*.js']
+        src: ['test/ServerSpec.js']
       }
     },
 
@@ -41,6 +41,7 @@ module.exports = function(grunt) {
     jshint: {
       files: [
         // Add filespec list here
+        'dest/output.min.js'
         ],
         options: {
           force: 'true',
@@ -104,7 +105,7 @@ grunt.registerTask('server-dev', function (target) {
   // Main grunt tasks
   ////////////////////////////////////////////////////
 
-  grunt.registerTask('default', ['concat', 'uglify']);
+  grunt.registerTask('default', ['concat', 'uglify', 'jshint', 'mochaTest']);
 
   grunt.registerTask('test', [
     'mochaTest'
