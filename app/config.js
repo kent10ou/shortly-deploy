@@ -7,7 +7,7 @@ mongoose.connect('mongodb://localhost:27017');
 
 var Schema = mongoose.Schema;
 
-var Urls = new Schema({
+var urlSchema = new Schema({
   url: String,
   base_url: String,
   code: String,
@@ -17,16 +17,17 @@ var Urls = new Schema({
 
 });
 
-var Users = new Schema({
+var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   timeStamps: Date
 })
 
-var Users = mongoose.model('Users', userSchema);
-var Urls = mongoose.model('Urls', userSchema);
+var mongooseObj = {};
+mongooseObj.url = mongoose.model('url', urlSchema);
+mongooseObj.user = mongoose.model('user', userSchema);
 
-Users.create({username: 'shortly', password: '12345'});
+module.exports = mongooseObj;
 // var db = Bookshelf.initialize({
 //   client: 'sqlite3',
 //   connection: {
