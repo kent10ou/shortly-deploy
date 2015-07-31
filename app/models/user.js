@@ -1,35 +1,36 @@
-var db = require('../config');
+
 var bcrypt = require('bcrypt-nodejs');
 var mongoose = require('mongoose');
+var bluebird = require('bluebird');
 
-// console.log('db.user', Object.keys(db.user));
-var User = db.user;
-
-var userSchema = new Schema({
-  username: { type: String, required: true, unique: true },
+// setting up fields for username/pw
+var userSchema = mongoose.Schema({
+  username: { type: String, required: true, index: { unique: true } },
   password: { type: String, required: true },
-})
+});
 
+// creating a mongoose ORM model for User
+var User = mongoose.model('User', userSchema);
 
+// a prototype function to compare the submitted password and the pw on the DB
+// 
+User.comparePassword = function(candidatePassword, savedPassword, callback) {
+  bcrypt.compare(candidatePassword, savedPassword, function(err, isMatch) {
+    if (err) {
+      return callback(err);
+    } 
+    callback(null, isMatch);
+  });
+}
 
-// var User = db.Model.extend({
-//   tableName: 'users',
-//   hasTimestamps: true,
-//   initialize: function(){
-//     this.on('creating', this.hashPassword);
-//   },
-  comparePassword: function(attemptedPassword, callback) {
-    bcrypt.compare(attemptedPassword, this.get('password'), function(err, isMatch) {
-      callback(isMatch);
-    });
-//   },
-//   hashPassword: function(){
-//     var cipher = Promise.promisify(bcrypt.hash);
-//     return cipher(this.get('password'), null, null).bind(this)
-//       .then(function(hash) {
-//         this.set('password', hash);
-//       });
-//   }
-// });
+// when the save event is generated, it is encrypting the pw, preparing it to be placed on DB
+userSchema.pre('save', function (next) {
+  var cipher = bluebird.promisify(bcrypt.hash);
+  return cipher(this.password, null, null).bind(this)
+  .then(function(hash) {
+    this.password = hash;
+    next();
+  });
+});
 
 module.exports = User;
