@@ -14,7 +14,7 @@ var User = mongoose.model('User', userSchema);
 
 // a prototype function to compare the submitted password and the pw on the DB
 // 
-User.comparePassword = function(candidatePassword, savedPassword, callback) {
+User.prototype.comparePassword = function(candidatePassword, savedPassword, callback) {
   bcrypt.compare(candidatePassword, savedPassword, function(err, isMatch) {
     if (err) {
       return callback(err);
